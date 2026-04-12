@@ -2113,6 +2113,10 @@ function PlayPageClient() {
 
     // 检查是否为短剧格式
     if (episodeData && episodeData.startsWith('shortdrama:')) {
+      // 🔥 短剧需要异步获取真实URL，必须显示loading状态
+      console.log('🎬 短剧切集：需要异步解析URL，显示loading');
+      setLoading(true);
+
       try {
         const [, videoId, episode] = episodeData.split(':');
         // 添加剧名参数以支持备用API fallback
@@ -2127,6 +2131,7 @@ function PlayPageClient() {
           if (newUrl !== videoUrl) {
             setVideoUrl(newUrl);
           }
+          setLoading(false);
         } else {
           // 读取API返回的错误信息
           try {
@@ -2136,11 +2141,13 @@ function PlayPageClient() {
             setError('短剧解析失败');
           }
           setVideoUrl('');
+          setLoading(false);
         }
       } catch (err) {
         console.error('短剧URL解析失败:', err);
         setError('播放失败，请稍后再试');
         setVideoUrl('');
+        setLoading(false);
       }
     } else {
       // 普通视频格式
