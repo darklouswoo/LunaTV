@@ -107,12 +107,25 @@ export async function checkWatchingUpdates(forceRefresh = false): Promise<void> 
       id: key
     }));
 
-    // 🔥 修复：即使没有播放记录，也要检查新上映的想看内容
-    // if (records.length === 0) {
-    //   console.log('无播放记录，跳过更新检查');
-    //   ...
-    // }
-    // 移除这个提前返回，让代码继续执行到检查新上映的部分
+    if (records.length === 0) {
+      console.log('无播放记录，跳过更新检查');
+      const emptyResult: WatchingUpdate = {
+        hasUpdates: false,
+        timestamp: currentTime,
+        updatedCount: 0,
+        continueWatchingCount: 0,
+        newReleasesCount: 0,
+        updatedSeries: []
+      };
+      cacheWatchingUpdates(emptyResult);
+      if (STORAGE_TYPE !== 'localstorage') {
+        memoryLastCheckTime = currentTime;
+      } else {
+        localStorage.setItem(LAST_CHECK_TIME_KEY, currentTime.toString());
+      }
+      notifyListeners(false);
+      return;
+    }
 
     // 筛选多集剧的记录（与Alpha版本保持一致，不限制是否看完）
     const candidateRecords = records.filter(record => {
@@ -120,9 +133,7 @@ export async function checkWatchingUpdates(forceRefresh = false): Promise<void> 
     });
 
     console.log(`找到 ${candidateRecords.length} 个可能有更新的剧集`);
-    if (candidateRecords.length > 0) {
-      console.log('候选记录详情:', candidateRecords.map(r => ({ title: r.title, index: r.index, total: r.total_episodes })));
-    }
+    console.log('候选记录详情:', candidateRecords.map(r => ({ title: r.title, index: r.index, total: r.total_episodes })));
 
     let hasAnyUpdates = false;
     let updatedCount = 0;

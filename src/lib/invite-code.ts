@@ -7,7 +7,6 @@
 import { customAlphabet } from 'nanoid';
 
 import { db } from './db';
-import { createCompatClient } from './redis-compat';
 
 // 生成邀请码：8位大写字母+数字，排除易混淆字符 (0/O, 1/I/l)
 const alphabet = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
@@ -19,7 +18,7 @@ function getRedisClient() {
   if (!storage || !storage.client) {
     throw new Error('Redis 客户端不可用，邀请码系统需要 Redis 存储');
   }
-  return createCompatClient(storage.client);
+  return storage.client;
 }
 
 export interface InviteCodeData {
@@ -132,7 +131,7 @@ export async function validateInviteCode(
   }
 
   // 检查是否被禁用
-  if ((inviteData.disabled as unknown as string) === 'true' || inviteData.disabled === true) {
+  if (inviteData.disabled) {
     return { valid: false, error: '邀请码已被禁用' };
   }
 

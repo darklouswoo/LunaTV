@@ -650,7 +650,7 @@ function HomeClient() {
               year: 'numeric',
               month: '2-digit',
               day: '2-digit'
-            }).split('/').join('-'); // 转换为 YYYY-MM-DD 格式
+            }).split('/').reverse().join('-'); // 转换为 YYYY-MM-DD 格式
 
             workerRef.current.postMessage({
               releases,
