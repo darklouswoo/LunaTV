@@ -644,6 +644,26 @@ export class DbManager {
     incrementDbQuery();
     await this.storage.clearCrashLogs();
   }
+
+  async addLoginLog(loginLog: any): Promise<void> {
+    incrementDbQuery();
+    await this.storage.addLoginLog(loginLog);
+  }
+
+  async getLoginLogs(limit?: number): Promise<any[]> {
+    incrementDbQuery();
+    return this.storage.getLoginLogs(limit);
+  }
+
+  async clearLoginLogs(): Promise<void> {
+    incrementDbQuery();
+    await this.storage.clearLoginLogs();
+  }
+
+  async getLastLoginLog(username: string): Promise<any | null> {
+    incrementDbQuery();
+    return this.storage.getLastLoginLog(username);
+  }
 }
 
 // 导出默认实例
